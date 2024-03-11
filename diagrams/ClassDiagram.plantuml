@@ -1,0 +1,384 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class AI {
+  + AI(AIPlayerStrategy, String):
+  + pickTokenPoolAndColor(): Pair<TokenPoolInterface, Tile>
+  + pickPatternRowForTiles(List<Tile>): int
+}
+interface AIPlayerStrategy << interface >> {
+  + pickTokenPoolAndColor(): Pair<TokenPoolInterface, Tile>
+  + pickPatternRowForTiles(List<Tile>): int
+   AIPlayer: AI
+}
+class Bag {
+  + Bag():
+  + extractOneTile(): Tile
+  + reset(): void
+  + putTile(Tile): void
+  + refill(List<Tile>): void
+   contents: List<Tile>
+   empty: boolean
+}
+class CLI {
+  + CLI():
+  + wipeScreen(): void
+  + showWallTilingScreen(): void
+  + showTilePatternPlacingScreen(): void
+  + showConfigScreen(): void
+  + showGameFinishedScreen(): void
+  + showTilePickingScreen(): void
+}
+class CLIScreenConfiguring {
+  + CLIScreenConfiguring(CLI):
+  - parseConfig(String, String): Integer?
+  + updateScreen(): void
+  - parseConfirm(String): boolean
+   configuration: Configuration
+}
+class CLIScreenGameFinished {
+  + CLIScreenGameFinished(UI):
+  + updateScreen(): void
+  - printScores(): void
+  + selectRestartOrQuit(): boolean
+  - printWinners(): void
+}
+class CLIScreenPlaying {
+  + CLIScreenPlaying(UI):
+  + updateScreen(): void
+  # printAllScores(): void
+  # printWallRow(PlayerBoard, int): void
+  # printFloor(Floor): void
+  # printPlayerBoard(PlayerBoard): void
+  # printPatternRow(PlayerBoard, int): void
+  # printTokenPool(TokenPoolInterface): void
+  # printField(Field): void
+}
+class CLIScreenTilePatternPlacing {
+  + CLIScreenTilePatternPlacing(UI):
+  + selectPatternRowForTiles(List<Tile>): int
+  + updateScreen(): void
+  # printHeldTiles(Player): void
+}
+class CLIScreenTilePicking {
+  + CLIScreenTilePicking(CLI):
+  - pickColor(TokenPoolInterface): Tile
+  - parseTileColorFromString(String): Tile
+  - pickTokenPool(): TokenPoolInterface
+  + selectTokenPoolAndColor(): Pair<TokenPoolInterface, Tile>
+}
+class CLIScreenWallTiling {
+  + CLIScreenWallTiling(UI):
+  + updateScreen(): void
+}
+enum Color << enumeration >> {
+  + Color():
+  + values(): Color[]
+  + valueOf(String): Color
+}
+entity Configuration << record >> {
+  + Configuration(int, int):
+  + humans(): int
+  + computers(): int
+}
+class Configuring {
+  + Configuring(Controller):
+  + entry(): void
+  + act(): void
+  + exit(): void
+}
+class Controller {
+  + Controller(UI):
+  + run(): void
+  + goToState(ControllerState): void
+  + refillFactories(): void
+  + incrementCurrentPlayer(): void
+  + determineWinners(): List<Player>
+  + quit(): void
+  + initGame(): void
+   UI: UI
+   field: Field
+   currentPlayerIndex: int
+   currentPlayer: Player
+   state: ControllerState
+   config: Configuration
+   players: List<Player>
+   discardPile: List<Tile>
+   bag: Bag
+}
+class ControllerState {
+  + ControllerState(Controller):
+  + exit(): void
+  + act(): void
+  + entry(): void
+}
+class Field {
+  + Field(int):
+  + fillFactoriesFromBag(Bag): boolean
+   center: TokenPoolInterface
+   factories: List<TokenPoolInterface>
+   nonEmptyFactories: List<TokenPoolInterface>
+}
+class Floor {
+  + Floor():
+  + hasStartingPlayerTile(): boolean
+  + placeTile(Tile): void
+  + reset(): List<Tile>
+   fillLevel: int
+   full: boolean
+   minusScore: int
+}
+class GUI {
+  + GUI():
+  + showWallTilingScreen(): void
+  + wipeScreen(): void
+  + showGameFinishedScreen(): void
+  + showConfigScreen(): void
+  + showTilePickingScreen(): void
+  + showTilePatternPlacingScreen(): void
+}
+class GameFinished {
+  + GameFinished(Controller):
+  + act(): void
+  + entry(): void
+  + exit(): void
+}
+class Human {
+  + Human(UI, String):
+  + pickTokenPoolAndColor(): Pair<TokenPoolInterface, Tile>
+  + pickPatternRowForTiles(List<Tile>): int
+}
+class Main {
+  + Main():
+  + main(String[]): void
+}
+interface NamedElement << interface >> {
+   name: String
+}
+class Pair<T1, T2> {
+  + Pair(T1, T2):
+}
+class PatternRows {
+  + PatternRows():
+  + getContentsOfRow(int): List<Tile>
+  + isRowFull(int): boolean
+  + addToRow(int, Tile): void
+  - isRowEmpty(int): boolean
+  - resetRow(int): void
+  + extractRow(int): List<Tile>
+  + isColorAvailableInRow(Tile, int): boolean
+}
+class Player {
+  + Player(String):
+  + pickPatternRowForTiles(List<Tile>): int
+  + holdTiles(List<Tile>): void
+  + pickTokenPoolAndColor(): Pair<TokenPoolInterface, Tile>
+  + extractHeldTiles(): List<Tile>
+   name: String
+   holdingTiles: boolean
+   heldTiles: List<Tile>
+   board: PlayerBoard
+}
+class PlayerBoard {
+  + PlayerBoard():
+  + isColorAvailableInRow(Tile, int): boolean
+  + performWallTiling(): List<Tile>
+  + placeTilesOnPatternRow(List<Tile>, int): List<Tile>
+  + finalizeScore(): void
+   score: int
+   floor: Floor
+   wall: Wall
+   patternRows: PatternRows
+}
+class RandomAIPlayerStrategy {
+  + RandomAIPlayerStrategy(Controller):
+  + pickPatternRowForTiles(List<Tile>): int
+  + pickTokenPoolAndColor(): Pair<TokenPoolInterface, Tile>
+   AIPlayer: AI
+}
+enum Tile << enumeration >> {
+  + Tile():
+  + values(): Tile[]
+  + valueOf(String): Tile
+}
+class TilePatternPlacing {
+  + TilePatternPlacing(Controller):
+  + exit(): void
+  + act(): void
+  + entry(): void
+}
+class TilePicking {
+  + TilePicking(Controller):
+  + act(): void
+  + entry(): void
+  + exit(): void
+}
+class TilePile {
+  + TilePile():
+  + setCounter(Color, int): void
+  + resetCounters(): void
+  + add(Map<Color, Integer>): void
+  + getCounter(Color): int
+  + remove(Color): int
+  + add(Color, int): void
+   empty: boolean
+   totalAmount: int
+   counters: Map<Color, Integer>
+}
+class TilePoolFaker {
+  + TilePoolFaker(String):
+  + addTiles(ArrayList<Tile>): void
+  + extractRemainingTiles(): List<Tile>
+  - TileToColor(Tile): Color
+  + addTile(Tile): void
+  - ColorToTile(Color): Tile
+  + extractTilesOfColor(Tile): List<Tile>
+   name: String
+   empty: boolean
+   contents: ArrayList<Tile>
+}
+class TokenPool {
+  + TokenPool(String):
+  + extractTilesOfColor(Tile): List<Tile>
+  + addTiles(ArrayList<Tile>): void
+  + extractRemainingTiles(): List<Tile>
+  + addTile(Tile): void
+   name: String
+   empty: boolean
+   contents: ArrayList<Tile>
+}
+interface TokenPoolInterface << interface >> {
+  + addTile(Tile): void
+  + addTiles(ArrayList<Tile>): void
+  + construct(String): TokenPoolInterface
+  + extractTilesOfColor(Tile): List<Tile>
+  + extractRemainingTiles(): List<Tile>
+   name: String
+   empty: boolean
+   contents: ArrayList<Tile>
+}
+class UI {
+  + UI():
+  + showTilePickingScreen(): void
+  + showConfigScreen(): void
+  + updateScreen(): void
+  + showWallTilingScreen(): void
+  + selectPatternRowForTile(List<Tile>): int
+  + showGameFinishedScreen(): void
+  + wipeScreen(): void
+  + showTilePatternPlacingScreen(): void
+  + selectTokenPoolAndColor(): Pair<TokenPoolInterface, Tile>
+   configuration: Configuration
+   controller: Controller
+   screen: UIScreen
+}
+class UIScreen {
+  + UIScreen(UI):
+  + selectPatternRowForTiles(List<Tile>): int
+  + updateScreen(): void
+  + selectTokenPoolAndColor(): Pair<TokenPoolInterface, Tile>
+  + selectRestartOrQuit(): boolean
+   configuration: Configuration
+}
+class Wall {
+  + Wall():
+  + tileRow(Tile, int): int
+  + getPlacedTilesOnRow(int): Boolean[]
+  + getTilePlacedElement(int, int): boolean
+  - tileElement(int, int): int
+  + isColorAvailableInRow(Tile, int): boolean
+  - calculateScoreForNewlyPlacedTile(int, int): int
+   numberOfFilledRows: int
+   numberOfFilledColumns: int
+   numberOfCompletedColors: long
+}
+class WallTiling {
+  + WallTiling(Controller):
+  + entry(): void
+  + act(): void
+  + exit(): void
+}
+
+AI                          "1" *-[#595959,plain]-> "strategy\n1" AIPlayerStrategy
+AI                           -[#000082,plain]-^  Player
+Bag                         "1" *-[#595959,plain]-> "contents\n*" Tile
+CLI                          -[#595959,dashed]->  CLIScreenConfiguring        : "«create»"
+CLI                          -[#595959,dashed]->  CLIScreenGameFinished       : "«create»"
+CLI                          -[#595959,dashed]->  CLIScreenTilePatternPlacing : "«create»"
+CLI                          -[#595959,dashed]->  CLIScreenTilePicking        : "«create»"
+CLI                          -[#595959,dashed]->  CLIScreenWallTiling         : "«create»"
+CLI                          -[#000082,plain]-^  UI
+CLIScreenConfiguring        "1" *-[#595959,plain]-> "currentConfig\n1" Configuration
+CLIScreenConfiguring         -[#595959,dashed]->  Configuration               : "«create»"
+CLIScreenConfiguring         -[#000082,plain]-^  UIScreen
+CLIScreenGameFinished        -[#000082,plain]-^  UIScreen
+CLIScreenPlaying             -[#000082,plain]-^  UIScreen
+CLIScreenTilePatternPlacing  -[#000082,plain]-^  CLIScreenPlaying
+CLIScreenTilePicking         -[#000082,plain]-^  CLIScreenPlaying
+CLIScreenTilePicking         -[#595959,dashed]->  Pair                        : "«create»"
+CLIScreenWallTiling          -[#000082,plain]-^  CLIScreenPlaying
+Configuring                  -[#000082,plain]-^  ControllerState
+Configuring                  -[#595959,dashed]->  TilePicking                 : "«create»"
+Controller                   -[#595959,dashed]->  AI                          : "«create»"
+Controller                  "1" *-[#595959,plain]-> "bag\n1" Bag
+Controller                   -[#595959,dashed]->  Bag                         : "«create»"
+Controller                   -[#595959,dashed]->  Configuration               : "«create»"
+Controller                  "1" *-[#595959,plain]-> "config\n1" Configuration
+Controller                   -[#595959,dashed]->  Configuring                 : "«create»"
+Controller                  "1" *-[#595959,plain]-> "state\n1" ControllerState
+Controller                  "1" *-[#595959,plain]-> "field\n1" Field
+Controller                   -[#595959,dashed]->  Field                       : "«create»"
+Controller                   -[#595959,dashed]->  Human                       : "«create»"
+Controller                  "1" *-[#595959,plain]-> "players\n*" Player
+Controller                   -[#595959,dashed]->  RandomAIPlayerStrategy      : "«create»"
+Controller                  "1" *-[#595959,plain]-> "discardPile\n*" Tile
+Controller                  "1" *-[#595959,plain]-> "ui\n1" UI
+ControllerState             "1" *-[#595959,plain]-> "controller\n1" Controller
+Field                       "1" *-[#595959,plain]-> "factories\n*" TokenPoolInterface
+Floor                       "1" *-[#595959,plain]-> "contents\n*" Tile
+Floor                        -[#595959,dashed]->  Tile                        : "«create»"
+GUI                          -[#000082,plain]-^  UI
+GameFinished                 -[#595959,dashed]->  Configuring                 : "«create»"
+GameFinished                 -[#000082,plain]-^  ControllerState
+Human                        -[#000082,plain]-^  Player
+Human                       "1" *-[#595959,plain]-> "ui\n1" UI
+Main                         -[#595959,dashed]->  CLI                         : "«create»"
+Main                         -[#595959,dashed]->  Controller                  : "«create»"
+Player                       -[#008200,dashed]-^  NamedElement
+Player                       -[#595959,dashed]->  PlayerBoard                 : "«create»"
+Player                      "1" *-[#595959,plain]-> "board\n1" PlayerBoard
+Player                      "1" *-[#595959,plain]-> "heldTiles\n*" Tile
+PlayerBoard                 "1" *-[#595959,plain]-> "floor\n1" Floor
+PlayerBoard                  -[#595959,dashed]->  Floor                       : "«create»"
+PlayerBoard                 "1" *-[#595959,plain]-> "patternRows\n1" PatternRows
+PlayerBoard                  -[#595959,dashed]->  PatternRows                 : "«create»"
+PlayerBoard                  -[#595959,dashed]->  Wall                        : "«create»"
+PlayerBoard                 "1" *-[#595959,plain]-> "wall\n1" Wall
+RandomAIPlayerStrategy      "1" *-[#595959,plain]-> "player\n1" AI
+RandomAIPlayerStrategy       -[#008200,dashed]-^  AIPlayerStrategy
+RandomAIPlayerStrategy      "1" *-[#595959,plain]-> "controller\n1" Controller
+RandomAIPlayerStrategy       -[#595959,dashed]->  Pair                        : "«create»"
+TilePatternPlacing           -[#000082,plain]-^  ControllerState
+TilePatternPlacing           -[#595959,dashed]->  TilePicking                 : "«create»"
+TilePatternPlacing           -[#595959,dashed]->  WallTiling                  : "«create»"
+TilePicking                  -[#000082,plain]-^  ControllerState
+TilePicking                  -[#595959,dashed]->  TilePatternPlacing          : "«create»"
+TilePile                    "1" *-[#595959,plain]-> "counters\n*" Color
+TilePoolFaker                -[#000082,plain]-^  TilePile
+TilePoolFaker                -[#008200,dashed]-^  TokenPoolInterface
+TokenPool                    -[#008200,dashed]-^  NamedElement
+TokenPool                   "1" *-[#595959,plain]-> "tiles\n*" Tile
+TokenPool                    -[#008200,dashed]-^  TokenPoolInterface
+TokenPoolInterface           -[#595959,dashed]->  TilePoolFaker               : "«create»"
+TokenPoolInterface           -[#595959,dashed]->  TokenPool                   : "«create»"
+UI                          "1" *-[#595959,plain]-> "controller\n1" Controller
+UI                          "1" *-[#595959,plain]-> "screen\n1" UIScreen
+UIScreen                    "1" *-[#595959,plain]-> "ui\n1" UI
+Wall                        "1" *-[#595959,plain]-> "layout\n*" Tile
+WallTiling                   -[#000082,plain]-^  ControllerState
+WallTiling                   -[#595959,dashed]->  GameFinished                : "«create»"
+WallTiling                   -[#595959,dashed]->  TilePicking                 : "«create»"
+@enduml

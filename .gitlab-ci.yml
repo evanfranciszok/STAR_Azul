@@ -1,0 +1,44 @@
+stages:
+  - docs
+  - build
+  - test
+
+build-job:
+  needs: []
+  image: maven
+  stage: build
+  script:
+    - mvn compile
+  rules:
+    - when: always
+
+test-job:
+  needs: ["build-job"]
+  image: maven
+  stage: test
+  script:
+    - mvn test
+  rules:
+    - when: always
+
+test-change-job:
+  needs: []
+  image: maven
+  stage: test
+  script:
+    - sed -i 's/useTeam11 = false;/useTeam11 = true;/g' src/main/java/game/components/TokenPoolInterface.java
+    - mvn compile
+    - mvn test
+diagram-job:
+  needs: []
+  image: 
+    name: plantuml/plantuml:latest
+    entrypoint: [""]
+  stage: docs
+  script:
+    - java -Djava.awt.headless=true -jar /opt/plantuml.jar -tsvg diagrams/*.puml
+  artifacts:
+    paths:
+      - diagrams/*.svg
+  rules:
+    - when: always

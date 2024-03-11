@@ -1,0 +1,49 @@
+@startuml
+'https://plantuml.com/state-diagram
+
+state Configuring
+Configuring: Entry/ Inform UI of state change
+Configuring: Do/ Accept configuration from UI
+Configuring: Exit/ Create and initialize game components based on configuration\n         Controller.setStartingPlayer() to player that most recently visited Portugal
+
+state GameFinished
+GameFinished: Entry/ Inform UI of state change
+GameFinished: Do/
+GameFinished: Exit/ Delete all game components
+
+
+state Playing {
+
+    state TilePicking
+    TilePicking: Entry/ Inform UI of state change\n            If [All TilePools (factories + center)  empty]: Fill factories, place "starting player marker" in center
+    TilePicking: Do/ Allow current player to pick tiles from a TilePool
+    TilePicking: Exit/
+
+    state TilePatternPlacing
+    TilePatternPlacing: Entry/ Inform UI of state change
+    TilePatternPlacing: Do/ Allow current player to place tiles on pattern line or floor
+    TilePatternPlacing: Exit/ Controller.incrementCurrentPlayer()
+
+    state WallTiling
+    WallTiling: Entry/ Inform UI of state change
+    WallTiling: Do/ For each player: Move tiles to wall and count score
+    WallTiling: Exit/ For each player: \n               If [Player has "starting player marker"]: controller.setStartingPlayer()\n               Subtract floor tiles from score\n               Discard unusable tiles
+
+    TilePicking -d-> TilePatternPlacing : Tiles picked
+    TilePatternPlacing -u-> TilePicking : All tiles placed
+    TilePatternPlacing -r-> WallTiling : All TilePools (factories + center) empty/
+    WallTiling -l-> TilePicking : All players have placed their tiles\n   [0 horizontal lines completed]/
+    WallTiling -d-> GameFinished : All players have placed their tiles\n  [At least 1 horizontal line completed]/
+}
+
+[*] -d-> Configuring
+Configuring -d-> TilePicking : Received Start call from UI\n[Configuration complete]/
+GameFinished -u[norank]-> Configuring : UI signalled replay/
+GameFinished -d-> [*] : UI signalled exit/
+
+note top of Playing
+    Playing is only modelled as a
+    state for clarity, it does not exist.
+end note
+
+@enduml

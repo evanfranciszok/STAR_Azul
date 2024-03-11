@@ -1,0 +1,49 @@
+@startuml
+'https://plantuml.com/state-diagram
+
+state Configuring
+Configuring: Entry/ Load current configuration from Controller and show configuration menu
+Configuring: Do/ Allow user to input configuration
+Configuring: Exit/ Controller.setConfiguration(<config>) and Controller.start()
+
+state GameFinished
+GameFinished: Entry/ Load scoring information from Controller and show Scoreboard
+GameFinished: Do/ Wait for user to select Replay or Exit
+GameFinished: Exit/
+
+
+state Playing {
+
+    state TilePicking
+    TilePicking: Entry/ Show game board and display which player has to pick tiles
+    TilePicking: Do/ Wait for current player to pick tiles from a TilePool and send that to the Controller
+    TilePicking: Exit/
+
+    state TilePatternPlacing
+    TilePatternPlacing: Entry/ Show game board and display which player has to place tiles
+    TilePatternPlacing: Do/ Wait for current player to place tiles on pattern line or floor and send that to the Controller
+    TilePatternPlacing: Exit/
+
+    state WallTiling
+    WallTiling: Entry/ Show game board before tiles are moved to wall
+    WallTiling: Do/ Controller.autoTileWalls()\n        Refresh game board
+    WallTiling: Exit/
+
+    TilePicking -d-> TilePatternPlacing : Controller signals switch to TilePatternPlacing/
+    TilePatternPlacing -u-> TilePicking : Controller signals switch to TilePicking/
+    TilePatternPlacing -r-> WallTiling : Controller signals switch to WallTiling/
+    WallTiling -l-> TilePicking : Controller signals switch to TilePicking/
+    WallTiling -d-> GameFinished : Controller signals switch to GameFinished/
+}
+
+[*] -d-> Configuring
+Configuring -d-> TilePicking : Controller signals switch to TilePicking/
+GameFinished -u[norank]-> Configuring : User selects Replay/ Controller.replay()
+GameFinished -d-> [*] : User selects Exit/ Controller.exit()
+
+note top of Playing
+    Playing is only modelled as a
+    state for clarity, it does not exist.
+end note
+
+@enduml
