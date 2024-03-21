@@ -32,7 +32,13 @@ public class PlayerBoardTest {
         var playerboard = new PlayerBoard();
         assertNotNull(playerboard.getFloor());
     }
-
+    @Test
+    void SetScoreTest() {
+        var playerBoard = new PlayerBoard();
+        assertEquals(0,playerBoard.getScore());
+        playerBoard.setScore(1);
+        assertEquals(1,playerBoard.getScore());
+    }
     @Test
     void PlaceTilesOnPatternLineFitting() {
         var playerBoard = new PlayerBoard();

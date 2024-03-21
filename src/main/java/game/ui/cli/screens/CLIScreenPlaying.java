@@ -1,10 +1,13 @@
 package game.ui.cli.screens;
 
 import game.components.*;
+import game.controller.states.GameForfeit;
+import game.player.Human;
 import game.ui.UI;
 import game.ui.UIScreen;
 
 import java.util.List;
+import java.util.Scanner;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -17,6 +20,7 @@ public abstract class CLIScreenPlaying extends UIScreen {
     public CLIScreenPlaying(UI ui) {
         super(ui);
     }
+
 
     /**
      * {@inheritDoc} <br/>
@@ -33,6 +37,16 @@ public abstract class CLIScreenPlaying extends UIScreen {
         System.out.println("Field:");
         printField(ui.getController().getField());
         printPlayerBoard(ui.getController().getCurrentPlayer().getBoard());
+        System.out.println("Forfeit by pressing 0, or continue by pressing 1.");
+        Scanner scanner = new Scanner(System.in);
+        try{String input = scanner.nextLine();
+            if (Integer.parseInt(input) == 0 && ui.getController().getCurrentPlayer().getClass() == Human.class){
+                ui.getController().goToState(new GameForfeit(ui.getController()));
+            }
+        }
+        catch(Exception e){
+            System.out.println("Invalid option.");
+        }
     }
 
     /**

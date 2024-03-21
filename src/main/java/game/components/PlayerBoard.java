@@ -119,7 +119,9 @@ public class PlayerBoard {
     public int getScore() {
         return score;
     }
-
+    public void setScore(int newScore) {
+        this.score = newScore;
+    }
     /**
      * getter for the wall of the player board
      *
