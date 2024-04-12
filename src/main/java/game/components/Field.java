@@ -18,8 +18,10 @@ public class Field {
      * The constructor
      *
      * @param factory_count (int) The amount of factories on the field
-     * @throws InvalidParameterException When the amount of factories is less than 1 or mor than 9
+     * @throws InvalidParameterException When the amount of factories is less than 1 or more than 9
      */
+    //@ requires factory_count >= 1 && factory_count <= 9;
+    //@ ensures factories.size() == factory_count;
     public Field(int factory_count) throws InvalidParameterException {
         if (factory_count < 1 || factory_count > 9) {
             throw new InvalidParameterException("field needs at least 1 and at most 9 factories");
@@ -32,10 +34,11 @@ public class Field {
     }
 
     /**
-     * Getter fot the center
+     * Getter for the center
      *
      * @return The center
      */
+    //@ ensures \result == center;
     public TokenPoolInterface getCenter() {
         return center;
     }
@@ -46,6 +49,7 @@ public class Field {
      * @param bag (Bag) The bag from which the tiles can be grabbed
      * @return Whether enough tiles were available to fill the factories
      */
+    //@ ensures (\forall TokenPoolInterface factory; factories.contains(factory); factory.getContents().size() == 4);
     public boolean fillFactoriesFromBag(Bag bag) {
         if (center.isEmpty()) {
             center.addTile(Tile.STARTING_PLAYER_TILE);
@@ -66,6 +70,7 @@ public class Field {
      *
      * @return The factories
      */
+    //@ ensures \result.equals(factories);
     public List<TokenPoolInterface> getFactories() {
         return factories;
     }
@@ -75,6 +80,7 @@ public class Field {
      *
      * @return all not empty factories
      */
+    //@ ensures \result.size() == (\old(factories.stream().filter(factory -> !factory.isEmpty()).toList()).size());
     public List<TokenPoolInterface> getNonEmptyFactories() {
         return new ArrayList<>(factories.stream().filter(factory -> !factory.isEmpty()).toList());
     }
