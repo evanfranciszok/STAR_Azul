@@ -3,6 +3,7 @@ package game.components;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 public class Floor {
 
 
@@ -56,10 +57,13 @@ public class Floor {
      * @throws IllegalStateException If the floor is full and the @p tile is not a Tile.STARTING_PLAYER_TILE
      */
 
-    //@ requires tile != null;
+
     //@ ensures !isFull() ==> (getFillLevel() == \old(getFillLevel()) + 1);
     //@ ensures tile == Tile.STARTING_PLAYER_TILE ==> hasStartingPlayerTile();
-
+    //@ requires tile != null;
+    //@ ensures containsStartingPlayerTileTest ==> currentIndexTest == \old(currentIndexTest);
+    //@ ensures !containsStartingPlayerTileTest ==> (currentIndexTest == \old(currentIndexTest) + 1 || currentIndexTest == \old(currentIndexTest));
+    //@ signals (IllegalStateException) isFull();
     public void placeTile(Tile tile) throws IllegalStateException {
         if (tile == Tile.STARTING_PLAYER_TILE) {
             containsStartingPlayerTile = true;
@@ -80,7 +84,9 @@ public class Floor {
      * @return The extracted tiles from the floor, does not include STARTING_PLAYER_TILE
      */
     //@ ensures getFillLevel() == 0 && !hasStartingPlayerTile() && \result.isEmpty();
-
+    //@ ensures currentIndexTest == 0;
+    //@ ensures contentsTest != null && contentsTest.length == FLOOR_SIZE;
+    //@ ensures !containsStartingPlayerTileTest;
     public List<Tile> reset() {
         var returnedTiles = new ArrayList<>(Arrays.asList(contents).subList(0, currentIndex).stream().filter(tile -> tile != Tile.STARTING_PLAYER_TILE).toList());
         currentIndex = 0;
@@ -121,6 +127,8 @@ public class Floor {
      */
 
     //@ ensures \result <= 0;
+
+    //@ ensures \result == (\sum int i; 0 <= i && i < currentIndexTest; MINUS_POINTSTest[i]);
     public int getMinusScore() {
         int totalMinusPoints = 0;
         for (var i = 0; i < currentIndex; ++i) {
