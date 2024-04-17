@@ -35,6 +35,10 @@ public class PatternRows {
      * @param row   (int) The row
      * @return true if the color can be placed in this row, else false
      */
+    // @ requires color != null;
+    // @ requires row >= 0 && row < N_ROWS;
+    // @ ensures \result == (color != Tile.STARTING_PLAYER_TILE &&
+    // (rows[row].isEmpty() || rows[row].get(0) == color));
     public boolean isColorAvailableInRow(Tile color, int row) {
         if (color == Tile.STARTING_PLAYER_TILE) {
             return false;
@@ -51,6 +55,8 @@ public class PatternRows {
      * @param row (int) The row that is checked whether it is full
      * @return true if the row is full, else false
      */
+    // @ requires row >= 0 && row < N_ROWS;
+    // @ ensures \result == (rows[row].size() >= (row + 1));
     public boolean isRowFull(int row) {
         // rows[0] may contain 1 tile, rows[4] may contain 5
         return rows[row].size() >= (row + 1);
@@ -65,6 +71,11 @@ public class PatternRows {
      * @throws IllegalArgumentException When trying to add to a row with other color
      *                                  tiles
      */
+    // @ requires row >= 0 && row < N_ROWS;
+    // @ requires tile != null;
+    // @ requires !isRowFull(row);
+    // @ requires isRowEmpty(row) || rows[row].get(0) == tile;
+    // @ ensures rows[row].contains(tile);
     public void addToRow(int row, Tile tile) throws IllegalStateException, IllegalArgumentException {
         if (isRowFull(row)) {
             throw new IllegalStateException("Trying to add to a full row of a pattern: " + row);
@@ -82,8 +93,12 @@ public class PatternRows {
      *
      * @param row (int) The row the tiles are being extracted from
      * @return The extracted tiles
-     * @throws IllegalStateException When trying to extract a non-empty row
+     * @throws IllegalStateException When trying to extract a non-full row
      */
+    // @ requires row >= 0 && row < N_ROWS;
+    // @ requires isRowFull(row);
+    // @ ensures resetRow(row);
+    // @ ensures \result != null;
     public List<Tile> extractRow(int row) throws IllegalStateException {
         if (!isRowFull(row)) {
             throw new IllegalStateException("Trying to extract a not full pattern row: " + row);
@@ -100,6 +115,8 @@ public class PatternRows {
      * @param row (int) The row to get the contents of
      * @return The contents of the row
      */
+    // @ requires row >= 0 && row < N_ROWS;
+    // @ ensures \result != null;
     public List<Tile> getContentsOfRow(int row) {
         return rows[row];
     }
@@ -110,6 +127,8 @@ public class PatternRows {
      *
      * @param row (int) The row number
      */
+    // @ requires row >= 0 && row < N_ROWS;
+    // @ ensures rows[row] != null;
     private void resetRow(int row) {
         rows[row] = new ArrayList<>();
     }
@@ -120,6 +139,8 @@ public class PatternRows {
      * @param row (int) The row number
      * @return If the row that belongs to the row number is empty
      */
+    // @ requires row >= 0 && row < N_ROWS;
+    // @ ensures \result == rows[row] == null || rows[row] isEmpty();
     private boolean isRowEmpty(int row) {
         return rows[row].isEmpty();
     }
