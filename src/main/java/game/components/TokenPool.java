@@ -19,6 +19,8 @@ public class TokenPool implements NamedElement, TokenPoolInterface {
     /**
      * Default constructor
      */
+    // @ ensures getName().equals(name);
+    // @ ensures getContents().isEmpty();
     public TokenPool(String name) {
         tiles = new ArrayList<>();
         this.name = name;
@@ -29,6 +31,7 @@ public class TokenPool implements NamedElement, TokenPoolInterface {
      *
      * @return the tiles in the TokenPool
      */
+    // @ ensures \result != null;
     public ArrayList<Tile> getContents() {
         return tiles;
     }
@@ -36,8 +39,11 @@ public class TokenPool implements NamedElement, TokenPoolInterface {
     /**
      * Add the given tiles to the pool
      *
-     * @param tiles (ArrayList<Tile>) The list of tiles that should be added to the pool
+     * @param tiles (ArrayList<Tile>) The list of tiles that should be added to the
+     *              pool
      */
+    // @ requires tiles != null;
+    // @ ensures getContents().containsAll(tiles);
     public void addTiles(ArrayList<Tile> tiles) {
         this.tiles.addAll(tiles);
     }
@@ -47,6 +53,8 @@ public class TokenPool implements NamedElement, TokenPoolInterface {
      *
      * @param tile (Tile) The tile that should be added to the pool
      */
+    // @ requires tile != null;
+    // @ ensures getContents().contains(tile);
     public void addTile(Tile tile) {
         tiles.add(tile);
     }
@@ -54,11 +62,17 @@ public class TokenPool implements NamedElement, TokenPoolInterface {
     /**
      * Extract all Tiles of a given color from the pool
      * And return the extracted tiles
-     * Note: This function also returns the STARTING_PLAYER_TILE if it is in this TokenPool
+     * Note: This function also returns the STARTING_PLAYER_TILE if it is in this
+     * TokenPool
      *
      * @param color (Tile) The color of the tiles to be extracted
      * @return (List < Tile >) The extracted tiles
      */
+    // @ requires color != null;
+    // @ ensures \result != null;
+    // @ ensures (\forall Tile t; \result.contains(t); t == color || t ==
+    // Tile.STARTING_PLAYER_TILE);
+    // @ ensures getContents().containsAll(\result);
     public List<Tile> extractTilesOfColor(Tile color) {
         if (color == Tile.STARTING_PLAYER_TILE) {
             throw new InvalidParameterException("Extracting only the STARTING_PLAYER_TILE is not supported");
@@ -71,7 +85,8 @@ public class TokenPool implements NamedElement, TokenPoolInterface {
             }
         }
         if (tilesToExtract.isEmpty()) {
-            throw new InvalidParameterException("There are no tiles of the requested color available in this TokenPool");
+            throw new InvalidParameterException(
+                    "There are no tiles of the requested color available in this TokenPool");
         }
         if (tiles.remove(Tile.STARTING_PLAYER_TILE)) {
             tilesToExtract.add(Tile.STARTING_PLAYER_TILE);
@@ -84,6 +99,8 @@ public class TokenPool implements NamedElement, TokenPoolInterface {
      *
      * @return (List < Tile >) The extracted tiles
      */
+    // @ ensures \result != null;
+    // @ ensures getContents().isEmpty();
     public List<Tile> extractRemainingTiles() {
         var remainingTiles = tiles;
         tiles = new ArrayList<>();
@@ -93,6 +110,7 @@ public class TokenPool implements NamedElement, TokenPoolInterface {
     /**
      * @return Whether the TokenPool is empty or not
      */
+    // @ ensures \result == getContents().isEmpty();
     public boolean isEmpty() {
         return tiles.isEmpty();
     }
