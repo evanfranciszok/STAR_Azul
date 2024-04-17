@@ -17,6 +17,10 @@ public class PatternRows {
     /**
      * The default constructor
      */
+    // @ ensures rows != null;
+    // @ ensures rows.length == N_ROWS;
+    // @ ensures (\forall int i; i >= 0 && i < N_ROWS; rows[i] != null &&
+    // rows[i].isEmpty());
     public PatternRows() {
         rows = new ArrayList[N_ROWS];
         for (int i = 0; i < N_ROWS; i++) {
@@ -58,14 +62,16 @@ public class PatternRows {
      * @param row  (int) The row the tile is being added to
      * @param tile (Tile) The tile being added
      * @throws IllegalStateException    When trying to add to a full row
-     * @throws IllegalArgumentException When trying to add to a row with other color tiles
+     * @throws IllegalArgumentException When trying to add to a row with other color
+     *                                  tiles
      */
     public void addToRow(int row, Tile tile) throws IllegalStateException, IllegalArgumentException {
         if (isRowFull(row)) {
             throw new IllegalStateException("Trying to add to a full row of a pattern: " + row);
         }
         if (!isRowEmpty(row) && rows[row].get(0) != tile) {
-            throw new IllegalArgumentException("Tile cannot be added to pattern row: " + row + ", tile in pattern row: " + rows[row].get(0) + " != " + tile);
+            throw new IllegalArgumentException("Tile cannot be added to pattern row: " + row + ", tile in pattern row: "
+                    + rows[row].get(0) + " != " + tile);
         }
         rows[row].add(tile);
     }
