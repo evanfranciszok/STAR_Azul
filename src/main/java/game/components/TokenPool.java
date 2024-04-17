@@ -32,6 +32,7 @@ public class TokenPool implements NamedElement, TokenPoolInterface {
      * @return the tiles in the TokenPool
      */
     // @ ensures \result != null;
+    // @ ensures \result.equals(tiles);
     public ArrayList<Tile> getContents() {
         return tiles;
     }
@@ -78,6 +79,9 @@ public class TokenPool implements NamedElement, TokenPoolInterface {
             throw new InvalidParameterException("Extracting only the STARTING_PLAYER_TILE is not supported");
         }
         var tilesToExtract = new ArrayList<Tile>();
+
+        // @ loop_invariant i >= 0 && i <= tiles.size();
+        // @ decreases i;
         for (int i = tiles.size() - 1; i >= 0; --i) {
             if (tiles.get(i) == color) {
                 tilesToExtract.add(tiles.get(i));
@@ -121,6 +125,7 @@ public class TokenPool implements NamedElement, TokenPoolInterface {
      *
      * @return The name of the token pool
      */
+    // @ ensures \result.equals(name);
     @Override
     public String getName() {
         return name;
