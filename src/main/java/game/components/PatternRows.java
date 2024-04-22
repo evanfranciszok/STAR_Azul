@@ -39,6 +39,7 @@ public class PatternRows {
     // @ requires row >= 0 && row < N_ROWS;
     // @ ensures \result == (color != Tile.STARTING_PLAYER_TILE &&
     // (rows[row].isEmpty() || rows[row].get(0) == color));
+    // @ pure
     public boolean isColorAvailableInRow(Tile color, int row) {
         if (color == Tile.STARTING_PLAYER_TILE) {
             return false;
@@ -57,6 +58,7 @@ public class PatternRows {
      */
     // @ requires row >= 0 && row < N_ROWS;
     // @ ensures \result == (rows[row].size() >= (row + 1));
+    // @ pure
     public boolean isRowFull(int row) {
         // rows[0] may contain 1 tile, rows[4] may contain 5
         return rows[row].size() >= (row + 1);
