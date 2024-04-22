@@ -33,7 +33,7 @@ public class Bag {
 
         var NTilesPerColor = 20;
         //@ decreases NTilesPerColor - i;
-        //@ assert contents.size() % 5 == 0;
+        //@ loop_invariant contents.size() % 5 == 0;
         for (var i = 0; i < NTilesPerColor; ++i) {
             contents.add(Tile.BLUE);
             contents.add(Tile.ORANGE);
